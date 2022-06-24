@@ -20,9 +20,9 @@ public class ClientController {
     }
 
 
-    @RequestMapping(value = "/save-user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void save(@RequestBody Client client) {
-        this.REPO.save(client);
+    @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Client save(@RequestBody Client client) {
+        return this.REPO.save(client);
     }
 
     @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
@@ -32,7 +32,7 @@ public class ClientController {
         return client.toString();
     }
 
-    @RequestMapping(value = "/client-list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<String> viewClientList() {
         List<Client> clients = (List<Client>) this.REPO.findAll();
         List<String> clientsList = new ArrayList<>();
