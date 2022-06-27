@@ -2,6 +2,8 @@ package com.backendproject.web;
 
 import com.backendproject.data.ClientRepository;
 import com.backendproject.entities.Client;
+import com.backendproject.service.ClientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,33 +15,25 @@ import java.util.Optional;
 @RestController
 public class ClientController {
 
-    private final ClientRepository REPO;
-
-    public ClientController(ClientRepository repo) {
-        this.REPO = repo;
-    }
-
+    @Autowired
+    ClientService service;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Client save(@RequestBody Client client) {
-        return this.REPO.save(client);
+        return service.createNewClient(client);
     }
 
     @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
-    public String findUser(@PathVariable long id) {
-        Optional<Client> client = this.REPO.findById(id);
-
-        return client.toString();
+    public Optional<Client> findUser(@PathVariable long id) {
+        return service.searchClient(id);
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<String> viewClientList() {
-        List<Client> clients = (List<Client>) this.REPO.findAll();
-        List<String> clientsList = new ArrayList<>();
+        List<String> clients = new ArrayList<>();
+        service.listClients().forEach(client -> clients.add(client.toString()));
 
-        clients.forEach(client -> clientsList.add(client.toString()));
-
-        return clientsList;
+        return clients;
     }
 
     @Transactional
@@ -47,12 +41,12 @@ public class ClientController {
     public void updateUser(@PathVariable long id,
                            @RequestBody Client client) {
 
-        this.REPO.updateClient(client.getName(), client.getAge(), client.getEmail(), id);
+        service.updateClient(client, id);
     }
 
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable long id) {
 
-        this.REPO.deleteById(id);
+        service.deleteClient(id);
     }
 }
