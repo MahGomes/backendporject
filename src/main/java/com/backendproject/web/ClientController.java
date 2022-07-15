@@ -1,16 +1,12 @@
 package com.backendproject.web;
 
-import com.backendproject.data.ClientRepository;
 import com.backendproject.entities.Client;
 import com.backendproject.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class ClientController {
@@ -19,34 +15,47 @@ public class ClientController {
     ClientService service;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public Client save(@RequestBody Client client) {
-        return service.createNewClient(client);
+        return service.saveClient(client);
     }
 
     @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
-    public Optional<Client> findUser(@PathVariable long id) {
-        return service.searchClient(id);
+    public ResponseEntity<Client> search(@PathVariable long id) {
+        return service.getClientById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public List<String> viewClientList() {
-        List<String> clients = new ArrayList<>();
-        service.listClients().forEach(client -> clients.add(client.toString()));
-
-        return clients;
+    public Iterable<Client> viewList() {
+        return service.getAllClients();
     }
 
-    @Transactional
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUser(@PathVariable long id,
-                           @RequestBody Client client) {
+    public ResponseEntity<Client> update(@PathVariable long id,
+                                             @RequestBody Client client) {
 
-        service.updateClient(client, id);
+        return service.getClientById(id)
+                .map(savedClient -> {
+                    savedClient.setFirstName(client.getFirstName());
+                    savedClient.setLastName(client.getLastName());
+                    savedClient.setAge(client.getAge());
+                    savedClient.setEmail(client.getEmail());
+
+                    Client updatedClient = service.updateClient(savedClient);
+                    return new ResponseEntity<>(updatedClient, HttpStatus.OK);
+
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable long id) {
-
+    public ResponseEntity<String> delete(@PathVariable long id) {
         service.deleteClient(id);
+
+        return new ResponseEntity<>("Client deleted!.", HttpStatus.OK);
     }
+
+
 }
