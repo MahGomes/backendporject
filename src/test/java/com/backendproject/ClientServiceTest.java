@@ -1,6 +1,7 @@
 package com.backendproject;
 
 import com.backendproject.data.ClientRepository;
+import com.backendproject.entities.Address;
 import com.backendproject.entities.Client;
 import com.backendproject.service.ClientService;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +33,16 @@ public class ClientServiceTest {
     @Test
     public void givenClientObject_whenCreateClient_thenReturnSavedClient() {
         // given
-        long id = 1;
+        Address address = Address.builder().build();
         Client client = Client.builder()
-                .firstName("Test")
-                .lastName("Test")
-                .email("Test@email.com")
-                .age(1)
+                .cpf("11122233344")
+                .name("Test")
+                .birth_date(new Date(20001001))
+                .marital_status("Single")
+                .address(address)
                 .build();
+
+        String id = client.getCpf();
 
         // when
         when(repo.findById(id)).thenReturn(Optional.of(client));
@@ -53,11 +58,13 @@ public class ClientServiceTest {
     public void givenListOfClients_whenGetAllClients_thenReturnClientList() {
         // given
         List<Client> clients = new ArrayList<>();
+        Address address = Address.builder().build();
         Client client = Client.builder()
-                .firstName("Test")
-                .lastName("Test")
-                .email("Test@email.com")
-                .age(1)
+                .cpf("11122233344")
+                .name("Test")
+                .birth_date(new Date(20001001))
+                .marital_status("Single")
+                .address(address)
                 .build();
 
         clients.add(client);
@@ -74,14 +81,16 @@ public class ClientServiceTest {
     @Test
     public void givenClientId_whenDeleteClient_shouldDeleteClient() {
         // given
-        long id = 1;
+        Address address = Address.builder().build();
         Client client = Client.builder()
-                .firstName("Test")
-                .lastName("Test")
-                .email("Test@email.com")
-                .age(1)
+                .cpf("11122233344")
+                .name("Test")
+                .birth_date(new Date(20001001))
+                .marital_status("Single")
+                .address(address)
                 .build();
 
+        String id = client.getCpf();
         // when
         when(repo.findById(id)).thenReturn(Optional.empty());
         service.saveClient(client);
@@ -95,23 +104,24 @@ public class ClientServiceTest {
     @Test
     public void givenUpdatedClient_whenUpdateClient_thenReturnUpdateClientObject() {
         // given
-        long id = 1;
+        Address address = Address.builder().build();
         Client client = Client.builder()
-                .id(id)
-                .firstName("Test")
-                .lastName("Test")
-                .email("Test@email.com")
-                .age(1)
+                .cpf("11122233344")
+                .name("Test")
+                .birth_date(new Date(20001001))
+                .marital_status("Single")
+                .address(address)
                 .build();
 
         Client updatedClient = Client.builder()
-                .id(id)
-                .firstName("Client")
-                .lastName("Test")
-                .email("Test@email.com")
-                .age(1)
+                .cpf("11122233344")
+                .name("Test")
+                .birth_date(new Date(20001001))
+                .marital_status("Single")
+                .address(address)
                 .build();
 
+        String id = client.getCpf();
         //when
         when(repo.save(ArgumentMatchers.any(Client.class))).thenReturn(client);
         when(repo.findById(id)).thenReturn(Optional.of(updatedClient));

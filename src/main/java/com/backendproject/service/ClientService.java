@@ -1,6 +1,7 @@
 package com.backendproject.service;
 
 import com.backendproject.data.ClientRepository;
+import com.backendproject.entities.Address;
 import com.backendproject.entities.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,15 @@ public class ClientService {
         return repo.save(client);
     }
 
-    public void deleteClient(long id) {
-        repo.deleteById(id);
+    public void deleteClient(String cpf) {
+        repo.deleteById(cpf);
     }
 
     public Iterable<Client> getAllClients() {
         return this.repo.findAll();
     }
 
-    public Optional<Client> getClientById(long id) {
-        return repo.findById(id);
+    public Optional<Client> getClientById(String cpf) {
+        return repo.findById(cpf);
     }
 }

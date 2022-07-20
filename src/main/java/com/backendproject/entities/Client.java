@@ -2,10 +2,8 @@ package com.backendproject.entities;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Setter
@@ -16,14 +14,16 @@ import javax.persistence.Id;
 public class Client {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String cpf;
 
-    private String firstName;
+    private String name;
 
-    private String lastName;
+    private Date birth_date;
 
-    private int age;
+    private String marital_status;
 
-    private String email;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
 }

@@ -1,5 +1,6 @@
 package com.backendproject.web;
 
+import com.backendproject.entities.Address;
 import com.backendproject.entities.Client;
 import com.backendproject.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ public class ClientController {
         return service.saveClient(client);
     }
 
-    @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Client> search(@PathVariable long id) {
-        return service.getClientById(id)
+    @RequestMapping(value = "/search/{cpf}", method = RequestMethod.GET)
+    public ResponseEntity<Client> search(@PathVariable String cpf) {
+        return service.getClientById(cpf)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -32,16 +33,24 @@ public class ClientController {
         return service.getAllClients();
     }
 
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Client> update(@PathVariable long id,
+    @RequestMapping(value = "/update/{cpf}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Client> update(@PathVariable String cpf,
                                              @RequestBody Client client) {
 
-        return service.getClientById(id)
+        return service.getClientById(cpf)
                 .map(savedClient -> {
-                    savedClient.setFirstName(client.getFirstName());
-                    savedClient.setLastName(client.getLastName());
-                    savedClient.setAge(client.getAge());
-                    savedClient.setEmail(client.getEmail());
+                    savedClient.setName(client.getName());
+                    savedClient.setBirth_date(client.getBirth_date());
+                    savedClient.setMarital_status(client.getMarital_status());
+
+                    Address address = service.getClientById(cpf).get().getAddress();
+                    address.setPostal_code(client.getAddress().getPostal_code());
+                    address.setCity(client.getAddress().getCity());
+                    address.setStreet(client.getAddress().getStreet());
+                    address.setState(client.getAddress().getState());
+                    address.setCountry(client.getAddress().getCountry());
+                    address.setNumber(client.getAddress().getNumber());
+                    savedClient.setAddress(address);
 
                     Client updatedClient = service.updateClient(savedClient);
                     return new ResponseEntity<>(updatedClient, HttpStatus.OK);
@@ -50,9 +59,9 @@ public class ClientController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        service.deleteClient(id);
+    @DeleteMapping("/delete/{cpf}")
+    public ResponseEntity<String> delete(@PathVariable String cpf) {
+        service.deleteClient(cpf);
 
         return new ResponseEntity<>("Client deleted!.", HttpStatus.OK);
     }
